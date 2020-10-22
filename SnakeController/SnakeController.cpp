@@ -77,6 +77,7 @@ void Controller::receive(std::unique_ptr<Event> e)
 
         bool lost = false;
 
+        // func()
         for (auto segment : m_segments) {
             if (segment.x == newHead.x and segment.y == newHead.y) {
                 m_scorePort.send(std::make_unique<EventT<LooseInd>>());
@@ -84,7 +85,9 @@ void Controller::receive(std::unique_ptr<Event> e)
                 break;
             }
         }
+        // eof func()
 
+        //finc()
         if (not lost) {
             if (std::make_pair(newHead.x, newHead.y) == m_foodPosition) {
                 m_scorePort.send(std::make_unique<EventT<ScoreInd>>());
@@ -107,7 +110,9 @@ void Controller::receive(std::unique_ptr<Event> e)
                 }
             }
         }
+        //eof func()
 
+        //func()
         if (not lost) {
             m_segments.push_front(newHead);
             DisplayInd placeNewHead;
@@ -124,6 +129,9 @@ void Controller::receive(std::unique_ptr<Event> e)
                     [](auto const& segment){ return not (segment.ttl > 0); }),
                 m_segments.end());
         }
+
+    //eof func()
+    //i każdy catch poniżej...
     } catch (std::bad_cast&) {
         try {
             auto direction = dynamic_cast<EventT<DirectionInd> const&>(*e)->direction;
@@ -193,3 +201,4 @@ void Controller::receive(std::unique_ptr<Event> e)
 }
 
 } // namespace Snake
+
