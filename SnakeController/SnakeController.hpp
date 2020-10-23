@@ -22,6 +22,15 @@ struct UnexpectedEventException : std::runtime_error
     UnexpectedEventException();
 };
 
+class Map 
+{
+public:
+    Map(int width, int height) : m_mapDimension(std::make_pair(width, height)) {}
+    bool isPositionOutsideMap(int x, int y) const;
+private:
+    std::pair<int, int> m_mapDimension;
+};
+
 class Controller : public IEventHandler
 {
 public:
@@ -36,8 +45,9 @@ private:
     IPort& m_displayPort;
     IPort& m_foodPort;
     IPort& m_scorePort;
+    Map m_map;
 
-    std::pair<int, int> m_mapDimension;
+    //std::pair<int, int> m_mapDimension;
     std::pair<int, int> m_foodPosition;
 
     struct Segment
@@ -62,7 +72,7 @@ private:
     void removeTailSegmentIfNotScored(Segment const& newHead);
     void removeTailSegment();
 
-    bool isPositionOutsideMap(int x, int y) const;
+    //bool isPositionOutsideMap(int x, int y) const;
 
     void updateFoodPosition(int x, int y, std::function<void()> clearPolicy);
     void sendClearOldFood();
