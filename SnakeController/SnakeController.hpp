@@ -52,6 +52,7 @@ private:
     std::list<Segment> m_segments;
 
     void checkFieldCollision(Segment& newHead, bool& lost);
+    void moveSnake(Segment& newHead, bool& lost);
 };
 
 } // namespace Snake
