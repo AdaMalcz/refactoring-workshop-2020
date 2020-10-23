@@ -167,6 +167,31 @@ void Controller::castFoodInd(EventT<FoodInd> e)
     m_foodPosition = std::make_pair(receivedFood.x, receivedFood.y);
 }
 
+void Controller::castFoodResp(EventT<FoodResp> e) 
+{
+    auto requestedFood = *e;
+
+    bool requestedFoodCollidedWithSnake = false;
+    for (auto const& segment : m_segments) {
+        if (segment.x == requestedFood.x and segment.y == requestedFood.y) {
+            requestedFoodCollidedWithSnake = true;
+            break;
+        }
+    }
+
+    if (requestedFoodCollidedWithSnake) {
+        m_foodPort.send(std::make_unique<EventT<FoodReq>>());
+    } else {
+        DisplayInd placeNewFood;
+        placeNewFood.x = requestedFood.x;
+        placeNewFood.y = requestedFood.y;
+        placeNewFood.value = Cell_FOOD;
+        m_displayPort.send(std::make_unique<EventT<DisplayInd>>(placeNewFood));
+    }
+
+    m_foodPosition = std::make_pair(requestedFood.x, requestedFood.y);
+}
+
 void Controller::receive(std::unique_ptr<Event> e)
 {
     try {
@@ -228,6 +253,8 @@ void Controller::receive(std::unique_ptr<Event> e)
 
             } catch (std::bad_cast&) {
                 try {
+                    castFoodResp(*dynamic_cast<EventT<FoodResp> const&>(*e));
+                    /*
                     //castFoodResp()
                     auto requestedFood = *dynamic_cast<EventT<FoodResp> const&>(*e);
 
@@ -251,6 +278,7 @@ void Controller::receive(std::unique_ptr<Event> e)
 
                     m_foodPosition = std::make_pair(requestedFood.x, requestedFood.y);
                     //
+                    */
                 } catch (std::bad_cast&) {
                     throw UnexpectedEventException();
                 }
