@@ -54,9 +54,11 @@ private:
 
     void checkFieldCollision(Segment& newHead, bool& lost);
     void moveSnake(Segment& newHead, bool& lost);
+    void castTimeoutInd(EventT<TimeoutInd> e);
     void castDirectionInd(EventT<DirectionInd> e);
     void castFoodInd(EventT<FoodInd> e);
     void castFoodResp(EventT<FoodResp> e);
+
 };
 
 } // namespace Snake

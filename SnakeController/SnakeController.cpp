@@ -192,9 +192,24 @@ void Controller::castFoodResp(EventT<FoodResp> e)
     m_foodPosition = std::make_pair(requestedFood.x, requestedFood.y);
 }
 
+void Controller::castTimeoutInd(EventT<TimeoutInd> e) 
+{
+    auto const& timerEvent = *e;
+    Segment const& currentHead = m_segments.front();
+    Segment newHead;
+
+    bool lost = false;
+    checkDirection(currentHead, newHead);
+    checkSnakeCollision(newHead, lost);
+    checkFieldCollision(newHead, lost);
+    moveSnake(newHead, lost);
+}
+
 void Controller::receive(std::unique_ptr<Event> e)
 {
     try {
+        castTimeoutInd(*dynamic_cast<EventT<TimeoutInd> const&>(*e));
+        /*
         auto const& timerEvent = *dynamic_cast<EventT<TimeoutInd> const&>(*e);
         Segment const& currentHead = m_segments.front();
         Segment newHead;
@@ -204,6 +219,7 @@ void Controller::receive(std::unique_ptr<Event> e)
         checkSnakeCollision(newHead, lost);
         checkFieldCollision(newHead, lost);
         moveSnake(newHead, lost);
+        */
     } catch (std::bad_cast&) {
         try {
             castDirectionInd(*dynamic_cast<EventT<DirectionInd> const&>(*e));
