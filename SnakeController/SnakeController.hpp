@@ -50,6 +50,8 @@ private:
 
     Direction m_currentDirection;
     std::list<Segment> m_segments;
+
+    void checkFieldCollision(Segment& newHead, bool& lost);
 };
 
 } // namespace Snake
