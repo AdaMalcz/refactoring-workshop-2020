@@ -127,6 +127,15 @@ void Controller::moveSnake(Segment& newHead, bool& lost)
     }
 }
 
+void Controller::castDirectionInd(EventT<DirectionInd> e) 
+{
+    auto direction = e->direction;
+
+    if ((m_currentDirection & 0b01) != (direction & 0b01)) {
+        m_currentDirection = direction;
+    }
+}
+
 void Controller::receive(std::unique_ptr<Event> e)
 {
     try {
@@ -134,21 +143,26 @@ void Controller::receive(std::unique_ptr<Event> e)
         Segment const& currentHead = m_segments.front();
         Segment newHead;
 
-        checkDirection(currentHead, newHead);
-
         bool lost = false;
+        checkDirection(currentHead, newHead);
         checkSnakeCollision(newHead, lost);
         checkFieldCollision(newHead, lost);
         moveSnake(newHead, lost);
     } catch (std::bad_cast&) {
         try {
+            castDirectionInd(*dynamic_cast<EventT<DirectionInd> const&>(*e));
+            /*
+            //castDirectionInd()
             auto direction = dynamic_cast<EventT<DirectionInd> const&>(*e)->direction;
 
             if ((m_currentDirection & 0b01) != (direction & 0b01)) {
                 m_currentDirection = direction;
             }
+            //
+            */
         } catch (std::bad_cast&) {
             try {
+                //castFoodInd()
                 auto receivedFood = *dynamic_cast<EventT<FoodInd> const&>(*e);
 
                 bool requestedFoodCollidedWithSnake = false;
@@ -176,9 +190,11 @@ void Controller::receive(std::unique_ptr<Event> e)
                 }
 
                 m_foodPosition = std::make_pair(receivedFood.x, receivedFood.y);
+                //
 
             } catch (std::bad_cast&) {
                 try {
+                    //castFoodResp()
                     auto requestedFood = *dynamic_cast<EventT<FoodResp> const&>(*e);
 
                     bool requestedFoodCollidedWithSnake = false;
@@ -200,6 +216,7 @@ void Controller::receive(std::unique_ptr<Event> e)
                     }
 
                     m_foodPosition = std::make_pair(requestedFood.x, requestedFood.y);
+                    //
                 } catch (std::bad_cast&) {
                     throw UnexpectedEventException();
                 }

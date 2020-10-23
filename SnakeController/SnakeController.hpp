@@ -5,6 +5,7 @@
 
 #include "IEventHandler.hpp"
 #include "SnakeInterface.hpp"
+#include "EventT.hpp"
 
 class Event;
 class IPort;
@@ -53,6 +54,7 @@ private:
 
     void checkFieldCollision(Segment& newHead, bool& lost);
     void moveSnake(Segment& newHead, bool& lost);
+    void castDirectionInd(EventT<DirectionInd> e);
 };
 
 } // namespace Snake
