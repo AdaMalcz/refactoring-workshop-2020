@@ -58,7 +58,6 @@ private:
     void castDirectionInd(EventT<DirectionInd> e);
     void castFoodInd(EventT<FoodInd> e);
     void castFoodResp(EventT<FoodResp> e);
-
 };
 
 } // namespace Snake
