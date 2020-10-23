@@ -70,9 +70,9 @@ void Controller::checkDirection(const Segment& currentHead, Segment& newHead)
     newHead.ttl = currentHead.ttl;
 }
 
-void Controller::checkSnakeCollision(std::list<Segment>& segments, Segment& newHead, bool& lost)
+void Controller::checkSnakeCollision(Segment& newHead, bool& lost)
 {
-    for (auto segment : segments) {
+    for (auto segment : m_segments) {
         if (segment.x == newHead.x and segment.y == newHead.y) {
             m_scorePort.send(std::make_unique<EventT<LooseInd>>());
             lost = true;
@@ -117,7 +117,7 @@ void Controller::receive(std::unique_ptr<Event> e)
         checkDirection(currentHead, newHead);
 
         bool lost = false;
-        checkSnakeCollision(m_segments, newHead, lost);
+        checkSnakeCollision(newHead, lost);
         checkFieldCollision(newHead, lost);
 
         //moveSnake()
