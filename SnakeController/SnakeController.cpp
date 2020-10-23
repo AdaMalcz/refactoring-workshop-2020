@@ -63,21 +63,25 @@ Controller::Controller(IPort& p_displayPort, IPort& p_foodPort, IPort& p_scorePo
     }
 }
 
+void Controller::checkDirection(const Segment& currentHead, Segment& newHead)
+{
+    newHead.x = currentHead.x + ((m_currentDirection & 0b01) ? (m_currentDirection & 0b10) ? 1 : -1 : 0);
+    newHead.y = currentHead.y + (not (m_currentDirection & 0b01) ? (m_currentDirection & 0b10) ? 1 : -1 : 0);
+    newHead.ttl = currentHead.ttl;
+}
+
 void Controller::receive(std::unique_ptr<Event> e)
 {
     try {
         auto const& timerEvent = *dynamic_cast<EventT<TimeoutInd> const&>(*e);
-
         Segment const& currentHead = m_segments.front();
-
         Segment newHead;
-        newHead.x = currentHead.x + ((m_currentDirection & 0b01) ? (m_currentDirection & 0b10) ? 1 : -1 : 0);
-        newHead.y = currentHead.y + (not (m_currentDirection & 0b01) ? (m_currentDirection & 0b10) ? 1 : -1 : 0);
-        newHead.ttl = currentHead.ttl;
+
+        checkDirection(currentHead, newHead);
 
         bool lost = false;
 
-        // func()
+        //checkSnakeCollision()
         for (auto segment : m_segments) {
             if (segment.x == newHead.x and segment.y == newHead.y) {
                 m_scorePort.send(std::make_unique<EventT<LooseInd>>());
@@ -85,9 +89,9 @@ void Controller::receive(std::unique_ptr<Event> e)
                 break;
             }
         }
-        // eof func()
+        //
 
-        //finc()
+        //checkFieldCollision()
         if (not lost) {
             if (std::make_pair(newHead.x, newHead.y) == m_foodPosition) {
                 m_scorePort.send(std::make_unique<EventT<ScoreInd>>());
@@ -110,9 +114,9 @@ void Controller::receive(std::unique_ptr<Event> e)
                 }
             }
         }
-        //eof func()
+        //
 
-        //func()
+        //moveSnake()
         if (not lost) {
             m_segments.push_front(newHead);
             DisplayInd placeNewHead;
@@ -129,9 +133,8 @@ void Controller::receive(std::unique_ptr<Event> e)
                     [](auto const& segment){ return not (segment.ttl > 0); }),
                 m_segments.end());
         }
+        //
 
-    //eof func()
-    //i każdy catch poniżej...
     } catch (std::bad_cast&) {
         try {
             auto direction = dynamic_cast<EventT<DirectionInd> const&>(*e)->direction;

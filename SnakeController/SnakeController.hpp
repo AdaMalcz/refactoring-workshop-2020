@@ -38,6 +38,7 @@ private:
         int y;
         int ttl;
     };
+    void checkDirection(const Segment& currentHead, Segment& newHead);
 
     IPort& m_displayPort;
     IPort& m_foodPort;
