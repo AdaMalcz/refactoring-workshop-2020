@@ -39,6 +39,7 @@ private:
         int ttl;
     };
     void checkDirection(const Segment& currentHead, Segment& newHead);
+    void checkSnakeCollision(std::list<Segment>& segments, Segment& newHead, bool& lost);
 
     IPort& m_displayPort;
     IPort& m_foodPort;
